@@ -8,9 +8,6 @@ describe "Dockerfile" do
     set :os, family: :debian
     set :backend, :docker
     set :docker_image, image.id
-
-    @log = Logger.new(STDOUT)
-    @log.level = Logger::DEBUG
   end
 
 # Causing false failures: redundant with below tests anyway.
