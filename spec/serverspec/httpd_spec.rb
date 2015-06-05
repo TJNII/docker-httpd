@@ -8,13 +8,30 @@ describe "Dockerfile" do
     set :os, family: :debian
     set :backend, :docker
     set :docker_image, image.id
+
+    @log = Logger.new(STDOUT)
+    @log.level = Logger::DEBUG
   end
 
   describe process("apache2") do
-    its(:user) { should eq "www-data" }
+    it { should be_running }
   end
 
   describe port(80) do
-    it { should be_listening }
+    it { should be_listening.with('tcp') }
+  end
+
+  # Check that the server returns 200 OK
+  # Use a simple curl command for the check
+  describe command("curl -IX GET http://127.0.0.1") do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match /200 OK/ }
+  end
+
+  # Check that the server returns the default content on GET /
+  # Use a simple curl command for the check
+  describe command("curl -s http://127.0.0.1") do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match /<HTML><BODY><H1>It Works!<\/H1><\/BODY><\/HTML>/ }
   end
 end
